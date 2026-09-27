@@ -12,6 +12,7 @@ export type DocumentAnalysis = {
   provider: "gemini" | "openai";
   understanding: DocumentUnderstanding;
   extractedChunkCount: number;
+  sourceSections?: Array<{ sourceNumber: number; text: string }>;
 };
 
 export type QuestionAnswer = {

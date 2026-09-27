@@ -16,6 +16,8 @@ export const maxDuration = 120;
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+const ZIP_SIGNATURE = [0x50, 0x4b, 0x03, 0x04];
+const XLS_SIGNATURE = [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1];
 
 function matchesFileType(bytes: Uint8Array, fileType: string) {
   if (fileType === "application/pdf") {
@@ -26,6 +28,16 @@ function matchesFileType(bytes: Uint8Array, fileType: string) {
   }
   if (fileType === "image/jpeg") {
     return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  }
+  if (fileType === "application/vnd.ms-excel") {
+    return XLS_SIGNATURE.every((byte, index) => bytes[index] === byte);
+  }
+  if (
+    fileType === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+    fileType === "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+  ) {
+    return ZIP_SIGNATURE.every((byte, index) => bytes[index] === byte);
   }
   return false;
 }
@@ -123,6 +135,19 @@ export async function POST(
       throw new Error("The document contains no readable text. Try a clearer scan or another file.");
     }
 
+    const officeMimeTypes = new Set([
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    ]);
+    const sourceSections = officeMimeTypes.has(document.file_type)
+      ? textPages.map((page) => ({
+          sourceNumber: page.pageNumber,
+          text: page.text,
+        }))
+      : undefined;
+
     const embeddingResult = await createEmbeddings(
       chunks.map((chunk) => chunk.content),
       "RETRIEVAL_DOCUMENT",
@@ -182,6 +207,7 @@ export async function POST(
       embeddingProvider: embeddingResult.provider,
       understanding: analysis.understanding,
       extractedChunkCount: chunks.length,
+      ...(sourceSections ? { sourceSections } : {}),
     });
   } catch (error) {
     if (documentId && userId) {

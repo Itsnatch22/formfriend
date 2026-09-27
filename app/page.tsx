@@ -7,6 +7,7 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  Download,
   FileText,
   HelpCircle,
   ListChecks,
@@ -47,7 +48,16 @@ type ChatMessage = {
   retrievalMode?: "semantic" | "keyword";
 };
 
-const allowedExtensions = new Set(["pdf", "png", "jpg", "jpeg"]);
+const allowedExtensions = new Set([
+  "pdf",
+  "png",
+  "jpg",
+  "jpeg",
+  "xls",
+  "xlsx",
+  "docx",
+  "pptx",
+]);
 const suggestedQuestions = [
   "What documents do I need?",
   "Who can fill this out?",
@@ -62,6 +72,20 @@ const checklist = [
 
 function getFileExtension(fileName: string) {
   return fileName.split(".").pop()?.toLowerCase() ?? "";
+}
+
+function getSourceLabel(fileName: string) {
+  switch (getFileExtension(fileName)) {
+    case "xls":
+    case "xlsx":
+      return "Worksheet";
+    case "pptx":
+      return "Slide";
+    case "docx":
+      return "Section";
+    default:
+      return "Page";
+  }
 }
 
 function getFileSize(size: number) {
@@ -127,7 +151,7 @@ function UploadZone({
 
     const extension = getFileExtension(file.name);
     if (!allowedExtensions.has(extension)) {
-      setError("Choose a PDF, JPG, or PNG file to continue.");
+      setError("Choose a PDF, JPG, PNG, Excel, Word, or PowerPoint file to continue.");
       return;
     }
 
@@ -157,9 +181,9 @@ function UploadZone({
         ref={inputRef}
         className="visually-hidden"
         type="file"
-        accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
+        accept=".pdf,.png,.jpg,.jpeg,.xls,.xlsx,.docx,.pptx,application/pdf,image/png,image/jpeg,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation"
         onChange={handleInputChange}
-        aria-label="Choose a PDF, JPG, or PNG form"
+        aria-label="Choose a PDF, image, Excel, Word, or PowerPoint document"
       />
       <div
         className={`upload-zone${isDragging ? " is-dragging" : ""}`}
@@ -194,6 +218,12 @@ function UploadZone({
           <span>JPG</span>
           <span className="meta-separator">·</span>
           <span>PNG</span>
+          <span className="meta-separator">·</span>
+          <span>XLS/XLSX</span>
+          <span className="meta-separator">·</span>
+          <span>DOCX</span>
+          <span className="meta-separator">·</span>
+          <span>PPTX</span>
           <span className="upload-meta-divider" />
           <span>No account required</span>
         </div>
@@ -496,6 +526,8 @@ function DocumentPanel({
   setPage,
   pageCount,
   isSample,
+  sourceLabel,
+  sourceSections,
 }: {
   file: File | null;
   fileUrl: string | null;
@@ -504,9 +536,13 @@ function DocumentPanel({
   setPage: (page: number) => void;
   pageCount: number;
   isSample: boolean;
+  sourceLabel: string;
+  sourceSections: NonNullable<DocumentAnalysis["sourceSections"]>;
 }) {
-  const isPdf = isSample || getFileExtension(file?.name ?? "") === "pdf";
-  const showPageControls = isSample || (isPdf && pageCount > 1);
+  const extension = getFileExtension(file?.name ?? "");
+  const isPdf = isSample || extension === "pdf";
+  const isOfficeFile = ["xls", "xlsx", "docx", "pptx"].includes(extension);
+  const showPageControls = isSample || ((isPdf || isOfficeFile) && pageCount > 1);
 
   return (
     <section className="document-panel" aria-label="Document preview">
@@ -518,7 +554,9 @@ function DocumentPanel({
           <div className="document-name-text">
             <strong>{isSample ? "Small business licence" : file?.name}</strong>
             <span>
-              {isSample ? "Sample document · 3 pages" : `${getFileSize(file?.size ?? 0)} · Private upload`}
+              {isSample
+                ? "Sample document · 3 pages"
+                : `${getFileSize(file?.size ?? 0)} · Private upload`}
             </span>
           </div>
           {isSample ? <span className="sample-tag">SAMPLE</span> : null}
@@ -543,6 +581,37 @@ function DocumentPanel({
             src={`${fileUrl}#page=${page}`}
             title={`Preview of ${file?.name ?? "uploaded document"}`}
           />
+        ) : isOfficeFile ? (
+          <div className="office-preview">
+            {sourceSections.find((section) => section.sourceNumber === page) ? (
+              <pre className="office-source-text">
+                {sourceSections.find((section) => section.sourceNumber === page)?.text}
+              </pre>
+            ) : (
+              <>
+                <span className="office-preview-icon">
+                  <FileText size={28} />
+                </span>
+                <strong>
+                  {extension === "docx"
+                    ? "Word document"
+                    : extension === "pptx"
+                      ? "PowerPoint presentation"
+                      : "Excel workbook"}
+                </strong>
+                <p>
+                  FormFriend extracts text for your guide. Download the original file
+                  to view its full layout.
+                </p>
+              </>
+            )}
+            {fileUrl ? (
+              <a className="button button-outline" href={fileUrl} download={file?.name}>
+                <Download size={15} />
+                Download original
+              </a>
+            ) : null}
+          </div>
         ) : fileUrl ? (
           <Image
             className="uploaded-image"
@@ -559,7 +628,7 @@ function DocumentPanel({
       {showPageControls ? (
         <div className="document-controls">
           <span className="page-counter">
-            Page <strong>{page}</strong> of {isSample ? 3 : pageCount}
+            {sourceLabel} <strong>{page}</strong> of {isSample ? 3 : pageCount}
           </span>
           <div className="page-buttons">
             <button
@@ -585,7 +654,9 @@ function DocumentPanel({
       ) : (
         <div className="local-file-note">
           <LockKeyhole size={13} />
-          Previewed locally in your browser
+          {isOfficeFile
+            ? `${sourceLabel} text extracted · ${pageCount} sources`
+            : "Previewed locally in your browser"}
         </div>
       )}
     </section>
@@ -599,6 +670,7 @@ function AssistantPanel({
   documentId,
   processing,
   processingError,
+  sourceLabel,
   onAsk,
   onRetry,
   onSourceClick,
@@ -609,6 +681,7 @@ function AssistantPanel({
   documentId: string | null;
   processing: boolean;
   processingError: string;
+  sourceLabel: string;
   onAsk: (question: string) => Promise<ChatMessage>;
   onRetry: () => void;
   onSourceClick: (page: number) => void;
@@ -828,7 +901,7 @@ function AssistantPanel({
                           key={`${message.id}-${sourcePage}`}
                         >
                           <FileText size={12} />
-                          Page {sourcePage}
+                          {sourceLabel} {sourcePage}
                         </button>
                       ))}
                     </div>
@@ -891,7 +964,7 @@ function AssistantPanel({
                           type="button"
                           onClick={() => onSourceClick(item.page!)}
                         >
-                          p. {item.page}
+                          {sourceLabel} {item.page}
                         </button>
                       ) : null}
                     </div>
@@ -918,7 +991,7 @@ function AssistantPanel({
                           type="button"
                           onClick={() => onSourceClick(item.page!)}
                         >
-                          p. {item.page}
+                          {sourceLabel} {item.page}
                         </button>
                       ) : null}
                     </div>
@@ -973,7 +1046,7 @@ function AssistantPanel({
                           key={`${message.id}-${sourcePage}`}
                         >
                           <FileText size={12} />
-                          Page {sourcePage}
+                          {sourceLabel} {sourcePage}
                         </button>
                       ))}
                     </div>
@@ -1156,6 +1229,8 @@ function WorkspaceView({
           setPage={setPage}
           pageCount={analysis?.pageCount ?? 1}
           isSample={isSample}
+          sourceLabel={getSourceLabel(file?.name ?? "")}
+          sourceSections={analysis?.sourceSections ?? []}
         />
         <AssistantPanel
           isSample={isSample}
@@ -1164,6 +1239,7 @@ function WorkspaceView({
           documentId={documentId}
           processing={false}
           processingError={processingError}
+          sourceLabel={getSourceLabel(file?.name ?? "")}
           onAsk={sendQuestion}
           onRetry={onRetry}
           onSourceClick={setPage}

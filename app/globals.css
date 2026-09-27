@@ -1519,6 +1519,56 @@
   box-shadow: 0 2px 14px rgb(36 36 28 / 12%);
 }
 
+.office-preview {
+  display: flex;
+  width: min(100%, 760px);
+  flex-direction: column;
+  align-items: center;
+  padding: 36px 28px;
+  border: 1px solid #e8e7e1;
+  border-radius: 14px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 2px 14px rgb(36 36 28 / 7%);
+}
+
+.office-source-text {
+  width: 100%;
+  max-height: 620px;
+  margin: 0;
+  overflow: auto;
+  color: #41413b;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.65;
+  text-align: left;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.office-preview-icon {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  border-radius: 15px;
+  background: #f2f0ff;
+  color: var(--primary);
+}
+
+.office-preview > strong {
+  margin-top: 17px;
+  color: #32322d;
+  font-size: 16px;
+}
+
+.office-preview > p {
+  margin: 9px 0 18px;
+  color: #777771;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 .preview-placeholder {
   padding: 40px;
   color: #8c8c86;

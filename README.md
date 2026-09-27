@@ -103,6 +103,14 @@ Initial formats:
 - PDF
 - PNG
 - JPG
+- Excel workbooks (`.xls`, `.xlsx`)
+- Word documents (`.docx`)
+- PowerPoint presentations (`.pptx`)
+
+Text is extracted from Office files on the server before analysis. Workbook citations
+refer to worksheet source sections, presentation citations refer to slides, and Word
+citations refer to extracted text sections. The original Office file can be downloaded
+from the workspace; its full visual layout is not rendered in the preview.
 
 **Primary CTA:** `Upload a form`
 
@@ -326,7 +334,8 @@ settings.
 
 Apply `supabase/migrations/formfriend.sql` first if the core tables are not
 already present, then apply `20260927120000_document_storage.sql` followed by
-`20260927130000_document_understanding.sql`. These create the private bucket,
+`20260927130000_document_understanding.sql`, and
+`20260927140000_office_document_types.sql`. These create/update the private bucket,
 user-scoped Storage policies, summary field, and vector-search RPC. Uploaded
 documents and metadata are associated with the anonymous user. The service-role
 key is only used by server-side API routes and must never be prefixed with
@@ -367,7 +376,7 @@ app's local and deployed origins as redirect URLs. When a guest session exists,
 FormFriend links Google to that session so its document ownership is retained.
 
 The document API verifies the guest-session JWT, checks document ownership,
-extracts PDF text server-side, requests a grounded JSON overview, stores
+extracts PDF and Office text server-side, requests a grounded JSON overview, stores
 page-numbered text chunks and embeddings, and uses pgvector similarity search
 to answer questions with source-page citations. If vector retrieval is
 temporarily unavailable, it uses a disclosed keyword-search fallback. Each
@@ -489,7 +498,7 @@ Upload a form. We'll explain the rest.
 
 [ Upload form ]
 
-PDF · JPG · PNG
+PDF · JPG · PNG · XLS/XLSX · DOCX · PPTX
 No account required
 
 Explain fields · Find requirements · Ask questions

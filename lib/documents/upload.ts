@@ -9,6 +9,10 @@ const MIME_TYPES: Readonly<Record<string, string>> = {
   png: "image/png",
   jpg: "image/jpeg",
   jpeg: "image/jpeg",
+  xls: "application/vnd.ms-excel",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
 } as const;
 
 function getExtension(fileName: string) {
@@ -41,7 +45,7 @@ export async function uploadDocument(file: File) {
   const contentType = MIME_TYPES[extension];
 
   if (!contentType) {
-    throw new Error("Choose a PDF, JPG, or PNG file to continue.");
+    throw new Error("Choose a PDF, JPG, PNG, Excel, Word, or PowerPoint file to continue.");
   }
 
   if (file.size <= 0 || file.size > 20 * 1024 * 1024) {
