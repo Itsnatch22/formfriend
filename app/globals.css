@@ -280,6 +280,25 @@
     #f8f8f6;
 }
 
+.landing-orb {
+  position: absolute;
+  top: 42px;
+  right: max(4%, calc((100vw - 1280px) / 2));
+  width: clamp(220px, 29vw, 370px);
+  height: clamp(220px, 29vw, 370px);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.landing-orb .orb-container {
+  pointer-events: none;
+}
+
+.landing-content {
+  position: relative;
+  z-index: 1;
+}
+
 .story-section {
   padding: 88px 32px;
   border-top: 1px solid #edede8;
@@ -2295,6 +2314,14 @@
     background:
       radial-gradient(ellipse 290px 280px at 50% 39%, rgb(240 238 255 / 54%), transparent 82%),
       #f8f8f6;
+  }
+
+  .landing-orb {
+    top: 18px;
+    right: -52px;
+    width: 230px;
+    height: 230px;
+    opacity: 0.28;
   }
 
   .story-section {

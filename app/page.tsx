@@ -33,6 +33,7 @@ import { askDocumentQuestion, processDocument } from "@/lib/documents/client";
 import type { DocumentAnalysis, DocumentUnderstanding } from "@/lib/documents/types";
 import { Footer } from "@/components/Footer";
 import { HowItWorks } from "@/components/HowItWorks";
+import Orb from "@/components/Orb";
 import { Navbar } from "@/components/Navbar";
 import { ProblemStatement } from "@/components/ProblemStatement";
 import { TargetUsers } from "@/components/TargetUsers";
@@ -224,6 +225,9 @@ function HomeView({
   return (
     <>
       <main className="landing-main" id="top">
+        <div className="landing-orb" aria-hidden="true">
+          <Orb hue={275} hoverIntensity={0.45} backgroundColor="#f8f8f6" />
+        </div>
         <div className="landing-content">
           <div className="eyebrow">
             <span className="eyebrow-line" />
