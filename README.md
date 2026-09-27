@@ -423,6 +423,7 @@ The UI should be:
 - Document-first
 - Calm
 - Responsive
+- Supports a persistent dark theme alongside the system/light theme
 - AI-aware without looking like an “AI dashboard”
 
 The design takes inspiration from the interaction simplicity of Lovable, without copying its design.
@@ -641,7 +642,6 @@ Hackathon scope exclusions:
 - Complex navigation
 - Admin panel
 - Excessive animations
-- Dark/light theme switcher
 - Subscription system
 - Social feed
 - AI-agent architecture

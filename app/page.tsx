@@ -38,6 +38,7 @@ import Orb from "@/components/Orb";
 import { Navbar } from "@/components/Navbar";
 import { ProblemStatement } from "@/components/ProblemStatement";
 import { TargetUsers } from "@/components/TargetUsers";
+import { getUserFacingError } from "@/lib/user-facing-error";
 
 type AppView = "home" | "uploading" | "uploaded" | "sample";
 type ChatMessage = {
@@ -256,7 +257,7 @@ function HomeView({
     <>
       <main className="landing-main" id="top">
         <div className="landing-orb" aria-hidden="true">
-          <Orb hue={275} hoverIntensity={0.45} backgroundColor="#f8f8f6" />
+          <Orb hue={275} hoverIntensity={0.45} />
         </div>
         <div className="landing-content">
           <div className="eyebrow">
@@ -724,9 +725,7 @@ function AssistantPanel({
         },
       ]);
     } catch (error) {
-      setChatError(
-        error instanceof Error ? error.message : "Your question could not be answered.",
-      );
+      setChatError(getUserFacingError(error, "We couldn’t answer your question. Please try again."));
     } finally {
       setIsAsking(false);
     }
@@ -1275,9 +1274,7 @@ export default function Home() {
       setDocumentId(uploadedDocument.id);
       await understandDocument(uploadedDocument.id);
     } catch (error) {
-      setUploadError(
-        error instanceof Error ? error.message : "The upload failed unexpectedly.",
-      );
+      setUploadError(getUserFacingError(error, "Your file couldn’t be uploaded. Please try again."));
     }
   }
 
@@ -1290,7 +1287,7 @@ export default function Home() {
       setView("uploaded");
     } catch (error) {
       setProcessingError(
-        error instanceof Error ? error.message : "The document could not be understood.",
+        getUserFacingError(error, "We couldn’t understand this document. Please try again."),
       );
       setView("uploaded");
     }

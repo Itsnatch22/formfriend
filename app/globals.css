@@ -2658,3 +2658,326 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+:root.dark {
+  --background: #11110f;
+  --foreground: #f1f0ed;
+  --surface: #1a1a17;
+  --muted: #252521;
+  --muted-foreground: #aaa9a1;
+  --border: #35352f;
+  --input: #393932;
+  color-scheme: dark;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 10px;
+  border: 1px solid #e6e6e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #62625c;
+  cursor: pointer;
+  font-size: 11px;
+  transition: background 130ms ease, border-color 130ms ease, color 130ms ease;
+}
+
+.theme-toggle:hover {
+  border-color: #d8d7d0;
+  background: #fafaf8;
+  color: #373732;
+}
+
+:root.dark body,
+:root.dark .app-shell {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+:root.dark .topbar,
+:root.dark .problem-section,
+:root.dark .people-section,
+:root.dark .how-step,
+:root.dark .people-card,
+:root.dark .upload-state-card,
+:root.dark .upload-zone,
+:root.dark .button-outline,
+:root.dark .workspace-grid,
+:root.dark .document-toolbar,
+:root.dark .document-controls,
+:root.dark .local-file-note,
+:root.dark .assistant-panel,
+:root.dark .chat-composer,
+:root.dark .composer-field,
+:root.dark .citation,
+:root.dark .suggestion-chip,
+:root.dark .requirement-page,
+:root.dark .office-preview,
+:root.dark .theme-toggle {
+  border-color: #35352f;
+  background-color: #1a1a17;
+  color: #deddd8;
+}
+
+:root.dark .how-section,
+:root.dark .site-footer,
+:root.dark .landing-main,
+:root.dark .upload-state-screen,
+:root.dark .error-screen {
+  background:
+    radial-gradient(ellipse 390px 310px at 50% 42%, rgb(103 88 207 / 9%), transparent 80%),
+    #11110f;
+}
+
+:root.dark .landing-orb {
+  opacity: 0.42;
+}
+
+:root.dark .story-section,
+:root.dark .site-footer,
+:root.dark .problem-item,
+:root.dark .problem-item:first-child,
+:root.dark .workspace-grid,
+:root.dark .document-panel,
+:root.dark .document-toolbar,
+:root.dark .assistant-header,
+:root.dark .overview-card,
+:root.dark .requirements-section,
+:root.dark .chat-thread,
+:root.dark .chat-composer,
+:root.dark .document-controls,
+:root.dark .local-file-note,
+:root.dark .upload-state-file {
+  border-color: #32322d;
+}
+
+:root.dark .how-step,
+:root.dark .people-card,
+:root.dark .upload-state-card,
+:root.dark .error-card,
+:root.dark .upload-state-file,
+:root.dark .workspace-grid,
+:root.dark .office-preview,
+:root.dark .composer-field,
+:root.dark .citation,
+:root.dark .suggestion-chip,
+:root.dark .requirement-page,
+:root.dark .upload-zone,
+:root.dark .theme-toggle {
+  border-color: #393932;
+  background-color: #1a1a17;
+}
+
+:root.dark .upload-zone.is-dragging,
+:root.dark .button-outline:hover,
+:root.dark .icon-button:hover:not(:disabled),
+:root.dark .citation:hover,
+:root.dark .suggestion-chip:hover {
+  border-color: #51488f;
+  background-color: #242220;
+}
+
+:root.dark .brand,
+:root.dark .landing-content h1,
+:root.dark .story-intro h2,
+:root.dark .how-heading-row h2,
+:root.dark .people-heading h2,
+:root.dark .problem-item h3,
+:root.dark .how-step h3,
+:root.dark .people-card h3,
+:root.dark .upload-title,
+:root.dark .upload-state-card h1,
+:root.dark .workspace-title-row h1,
+:root.dark .document-name-text strong,
+:root.dark .assistant-title strong,
+:root.dark .overview-card h2,
+:root.dark .understanding-detail strong,
+:root.dark .analysis-empty h2,
+:root.dark .office-preview > strong,
+:root.dark .footer-brand {
+  color: #f0efeb;
+}
+
+:root.dark .landing-description,
+:root.dark .story-intro > p,
+:root.dark .problem-item p,
+:root.dark .how-step p,
+:root.dark .people-heading > p,
+:root.dark .people-card p,
+:root.dark .eyebrow,
+:root.dark .upload-subtitle,
+:root.dark .upload-meta,
+:root.dark .upload-disclosure,
+:root.dark .capability-row,
+:root.dark .workspace-title-row p,
+:root.dark .back-link,
+:root.dark .breadcrumb-step,
+:root.dark .breadcrumb-current,
+:root.dark .header-note,
+:root.dark .privacy-note,
+:root.dark .landing-nav a,
+:root.dark .site-footer-inner,
+:root.dark .document-name-text span,
+:root.dark .local-file-note,
+:root.dark .assistant-title > div > span,
+:root.dark .overview-card > p,
+:root.dark .understanding-detail p,
+:root.dark .checklist-item,
+:root.dark .message-content p,
+:root.dark .office-preview > p,
+:root.dark .office-source-text,
+:root.dark .page-counter,
+:root.dark .upload-state-description,
+:root.dark .upload-state-filename,
+:root.dark .analysis-empty p,
+:root.dark .composer-field textarea {
+  color: #b3b2ab;
+}
+
+:root.dark .landing-nav a:hover,
+:root.dark .story-text-link,
+:root.dark .how-upload-link,
+:root.dark .sample-link {
+  color: #b1a8ff;
+}
+
+:root.dark .button-outline,
+:root.dark .icon-button,
+:root.dark .theme-toggle,
+:root.dark .back-link:hover,
+:root.dark .citation,
+:root.dark .requirement-page,
+:root.dark .suggestion-chip {
+  color: #cbc9c2;
+}
+
+:root.dark .preview-badge,
+:root.dark .illustrative-label,
+:root.dark .upload-icon,
+:root.dark .problem-icon,
+:root.dark .how-step-icon,
+:root.dark .people-icon,
+:root.dark .document-file-icon,
+:root.dark .assistant-avatar,
+:root.dark .kicker-icon,
+:root.dark .empty-icon,
+:root.dark .office-preview-icon,
+:root.dark .message-avatar {
+  border-color: #3e3967;
+  background-color: #25223a;
+  color: #b5abff;
+}
+
+:root.dark .error-icon,
+:root.dark .upload-state-icon:not(.error) {
+  border-color: #3e3967;
+  background-color: #25223a;
+  color: #b5abff;
+}
+
+:root.dark .upload-state-icon.error {
+  border-color: #603a35;
+  background: #2a1d1a;
+  color: #ffb4a9;
+}
+
+:root.dark .error-card h1 {
+  color: #f0efeb;
+}
+
+:root.dark .error-eyebrow,
+:root.dark .error-description,
+:root.dark .upload-state-eyebrow,
+:root.dark .upload-state-privacy {
+  color: #b3b2ab;
+}
+
+:root.dark .preview-badge,
+:root.dark .illustrative-label {
+  color: #c1baff;
+}
+
+:root.dark .paper-content,
+:root.dark .paper-title h3,
+:root.dark .paper-section-title h3,
+:root.dark .form-field label,
+:root.dark .paper-info-box p,
+:root.dark .paper-note p,
+:root.dark .declaration-box,
+:root.dark .paper-checkbox-row {
+  color: #30302e;
+}
+
+:root.dark .paper-content {
+  background: #fff;
+}
+
+:root.dark .paper-input,
+:root.dark .paper-input-highlight,
+:root.dark .paper-checkbox,
+:root.dark .declaration-box {
+  border-color: #e6e6e1;
+  background-color: #fff;
+}
+
+:root.dark .paper-info-box,
+:root.dark .paper-note {
+  border-color: #eeeaff;
+  background-color: #faf9ff;
+}
+
+:root.dark .image-canvas,
+:root.dark .document-panel {
+  background-color: #151513;
+}
+
+:root.dark .chat-message.user .message-content {
+  background: #28243d;
+}
+
+:root.dark .chat-message.user .message-content p {
+  color: #e0dcff;
+}
+
+:root.dark .preview-notice,
+:root.dark .analysis-empty + .chat-composer {
+  border-color: #39344f;
+  background-color: #211f2b;
+  color: #c2bbf3;
+}
+
+:root.dark .sign-in-error,
+:root.dark .chat-error,
+:root.dark .upload-error {
+  border-color: #603a35;
+  background: #2a1d1a;
+  color: #ffb4a9;
+}
+
+:root.dark .button-outline:hover,
+:root.dark .citation:hover,
+:root.dark .suggestion-chip:hover,
+:root.dark .requirement-page:hover,
+:root.dark .icon-button:hover:not(:disabled) {
+  color: #c6beff;
+}
+
+:root.dark .composer-field textarea::placeholder {
+  color: #77766f;
+}
+
+@media (max-width: 700px) {
+  .theme-toggle {
+    width: 34px;
+    min-width: 34px;
+    padding: 0;
+  }
+
+  .theme-toggle span {
+    display: none;
+  }
+}

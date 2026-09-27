@@ -23,18 +23,18 @@ async function getAnonymousUser(): Promise<User> {
   const supabase = getSupabaseBrowserClient();
   const { data, error } = await supabase.auth.getSession();
 
-  if (error) throw new Error(`Could not check your private session: ${error.message}`);
+  if (error) {
+    console.error("Could not check the private upload session", error);
+    throw new Error("We couldn’t check your private upload session. Please try again.");
+  }
   if (data.session?.user) return data.session.user;
 
   const { data: anonymousData, error: signInError } =
     await supabase.auth.signInAnonymously();
 
   if (signInError || !anonymousData.user) {
-    throw new Error(
-      signInError
-        ? `Could not start a private guest session: ${signInError.message}. Check that Anonymous Sign-Ins are enabled in Supabase Auth.`
-        : "Could not start a private guest session. Check that Anonymous Sign-Ins are enabled in Supabase Auth.",
-    );
+    if (signInError) console.error("Could not start a private guest session", signInError);
+    throw new Error("Guest uploads aren’t available right now. Please try again in a little while.");
   }
 
   return anonymousData.user;
@@ -68,7 +68,8 @@ export async function uploadDocument(file: File) {
   });
 
   if (insertError) {
-    throw new Error(`Could not prepare your document: ${insertError.message}`);
+    console.error("Could not prepare the private document upload", insertError);
+    throw new Error("We couldn’t prepare your private upload. Please try again.");
   }
 
   let fileStored = false;
@@ -79,7 +80,8 @@ export async function uploadDocument(file: File) {
       .upload(filePath, file, { contentType, upsert: false });
 
     if (uploadError) {
-      throw new Error(`Could not upload your document: ${uploadError.message}`);
+      console.error("Could not upload the private document", uploadError);
+      throw new Error("We couldn’t upload your file. Check your connection and try again.");
     }
 
     fileStored = true;
@@ -93,18 +95,19 @@ export async function uploadDocument(file: File) {
       .single();
 
     if (updateError) {
-      throw new Error(`Your file was uploaded, but its status could not be saved: ${updateError.message}`);
+      console.error("Could not save the uploaded document status", updateError);
+      throw new Error("Your file was uploaded, but we couldn’t finish saving it. Please try again.");
     }
 
     return { id: documentId };
   } catch (uploadError) {
-    const cleanupErrors: string[] = [];
+    const cleanupErrors: unknown[] = [];
 
     if (fileStored) {
       const { error } = await supabase.storage
         .from(DOCUMENTS_BUCKET)
         .remove([filePath]);
-      if (error) cleanupErrors.push(`Stored file cleanup failed: ${error.message}`);
+      if (error) cleanupErrors.push(error);
     }
 
     const { error: updateError } = await supabase
@@ -112,14 +115,14 @@ export async function uploadDocument(file: File) {
       .update({ status: "failed" })
       .eq("id", documentId)
       .eq("user_id", user.id);
-    if (updateError) cleanupErrors.push(`Document status cleanup failed: ${updateError.message}`);
+    if (updateError) cleanupErrors.push(updateError);
 
     const message =
       uploadError instanceof Error ? uploadError.message : "The upload failed unexpectedly.";
 
     if (cleanupErrors.length > 0) {
       console.error("FormFriend upload cleanup failed", cleanupErrors);
-      throw new Error(`${message} ${cleanupErrors.join(" ")}`);
+      throw new Error(`${message} We couldn’t clean up the incomplete upload; please contact support.`);
     }
 
     throw uploadError;

@@ -1,6 +1,7 @@
 "use client";
 
 import { Mesh, Program, Renderer, Triangle, Vec3 } from "ogl";
+import { useTheme } from "next-themes";
 import { useEffect, useRef } from "react";
 import "./Orb.css";
 
@@ -174,9 +175,12 @@ export default function Orb({
   hoverIntensity = 0.2,
   rotateOnHover = true,
   forceHoverState = false,
-  backgroundColor = "#000000",
+  backgroundColor,
 }: OrbProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { resolvedTheme } = useTheme();
+  const shaderBackground =
+    backgroundColor ?? (resolvedTheme === "dark" ? "#121211" : "#f8f8f6");
 
   useEffect(() => {
     const container = containerRef.current;
@@ -203,7 +207,7 @@ export default function Orb({
         hover: { value: 0 },
         rot: { value: 0 },
         hoverIntensity: { value: hoverIntensity },
-        backgroundColor: { value: hexToVec3(backgroundColor) },
+        backgroundColor: { value: hexToVec3(shaderBackground) },
       },
     });
     const mesh = new Mesh(gl, { geometry, program });
@@ -226,7 +230,7 @@ export default function Orb({
       program.uniforms.iTime.value = reduceMotion ? 0 : time * 0.001;
       program.uniforms.hue.value = hue;
       program.uniforms.hoverIntensity.value = hoverIntensity;
-      program.uniforms.backgroundColor.value = hexToVec3(backgroundColor);
+      program.uniforms.backgroundColor.value = hexToVec3(shaderBackground);
 
       const effectiveHover = reduceMotion ? 0 : forceHoverState ? 1 : targetHover;
       program.uniforms.hover.value +=
@@ -348,7 +352,7 @@ export default function Orb({
       program.remove();
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
-  }, [backgroundColor, forceHoverState, hue, hoverIntensity, rotateOnHover]);
+  }, [forceHoverState, hue, hoverIntensity, rotateOnHover, shaderBackground]);
 
   return <div ref={containerRef} className="orb-container" aria-hidden="true" />;
 }

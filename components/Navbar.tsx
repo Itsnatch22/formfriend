@@ -3,6 +3,8 @@
 import { FileText, LockKeyhole, ShieldCheck, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { getUserFacingError } from "@/lib/user-facing-error";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function Navbar({
   onHome,
@@ -26,7 +28,6 @@ export function Navbar({
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setHasAccount(Boolean(session?.user && !session.user.is_anonymous));
     });
-
     return () => subscription.unsubscribe();
   }, []);
 
@@ -47,7 +48,7 @@ export function Navbar({
       if (result.error) throw new Error(`Could not start Google sign-in: ${result.error.message}`);
     } catch (error) {
       setSignInError(
-        error instanceof Error ? error.message : "Google sign-in could not be started.",
+        getUserFacingError(error, "Google sign-in couldn’t be started. Please try again."),
       );
       setSignInPending(false);
     }
@@ -79,6 +80,7 @@ export function Navbar({
               <a href="#who-its-for">Who it&apos;s for</a>
             </nav>
             <div className="navbar-actions">
+              <ThemeToggle />
               <span className="header-note">
                 <ShieldCheck size={14} />
                 <span>No account needed</span>
@@ -103,6 +105,7 @@ export function Navbar({
           </>
         ) : (
           <div className="workspace-header-right">
+            <ThemeToggle />
             <span className="preview-badge">
               <span className="preview-dot" />
               {busy ? "Saving securely" : privateUpload ? "Saved privately" : "Sample preview"}
