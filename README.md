@@ -314,6 +314,59 @@ Animation should support comprehension rather than become the product.
 
 Authentication is optional. The core product should work without login.
 
+### Local Supabase Setup
+
+The no-login upload flow uses Supabase Anonymous Sign-Ins to give each browser
+a private user scope without showing a registration wall. Set
+`NEXT_PUBLIC_SUPABASE_URL` and either
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` or `NEXT_PUBLIC_SUPABASE_ANON_KEY` in
+`.env.local`, then enable **Anonymous Sign-Ins** in Supabase Authentication
+settings.
+
+Apply `supabase/migrations/formfriend.sql` first if the core tables are not
+already present, then apply `20260927120000_document_storage.sql` followed by
+`20260927130000_document_understanding.sql`. These create the private bucket,
+user-scoped Storage policies, summary field, and vector-search RPC. Uploaded
+documents and metadata are associated with the anonymous user. The service-role
+key is only used by server-side API routes and must never be prefixed with
+`NEXT_PUBLIC_`.
+
+Configure at least one AI provider in `.env.local`:
+
+```dotenv
+# Gemini (preferred for image and scanned-PDF understanding)
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_EMBEDDING_MODEL=gemini-embedding-001
+
+# Optional OpenAI-compatible fallback (base URL, commonly ending in /v1)
+OPENAI_COMPATIBLE_BASE_URL=
+OPENAI_COMPATIBLE_API_KEY=
+OPENAI_COMPATIBLE_MODEL=
+OPENAI_COMPATIBLE_EMBEDDING_MODEL=
+
+# Optional; defaults to Gemini first, then OpenAI-compatible
+DOCUMENT_AI_PROVIDER_ORDER=gemini,openai
+```
+
+The OpenAI-compatible endpoint must expose `/chat/completions` and `/embeddings`,
+and its embedding model must return exactly 1,536 dimensions to match the
+pgvector column. The compatible chat endpoint accepts images but not PDF files;
+PDF selectable text is extracted locally before sending, while scanned-PDF
+vision requires Gemini. The UI discloses that document content is sent to the
+configured AI provider. If every configured provider fails, processing shows a
+retry state instead of inventing a summary.
+
+The document API verifies the guest-session JWT, checks document ownership,
+extracts PDF text server-side, requests a grounded JSON overview, stores
+page-numbered text chunks and embeddings, and uses pgvector similarity search
+to answer questions with source-page citations. If vector retrieval is
+temporarily unavailable, it uses a disclosed keyword-search fallback. Each
+document records which embedding provider/model created its vectors so query
+embeddings stay in the same vector space; answer generation can still fail over
+between providers. The temporary large-file upload used by Gemini is deleted
+after processing.
+
 ### Anonymous / Free
 
 Users should be able to:
