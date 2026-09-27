@@ -1,7 +1,5 @@
 import "server-only";
 
-import { createRequire } from "node:module";
-import { pathToFileURL } from "node:url";
 import { XMLParser, XMLValidator } from "fast-xml-parser";
 import JSZip from "jszip";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
@@ -242,10 +240,9 @@ export async function extractDocumentPages(
 ): Promise<DocumentPage[]> {
   if (mimeType === "application/pdf") {
     const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-    const require = createRequire(import.meta.url);
-    pdfjs.GlobalWorkerOptions.workerSrc = pathToFileURL(
-      require.resolve("pdfjs-dist/legacy/build/pdf.worker.mjs"),
-    ).href;
+    pdfjs.GlobalWorkerOptions.workerSrc = await import.meta.resolve(
+      "pdfjs-dist/legacy/build/pdf.worker.mjs",
+    );
     const pdf = await pdfjs.getDocument({
       data: new Uint8Array(bytes),
       useSystemFonts: true,
