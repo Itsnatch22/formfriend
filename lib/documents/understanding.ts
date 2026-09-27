@@ -94,7 +94,7 @@ function configuredProviders(): ProviderName[] {
     configured.add("openai");
   }
 
-  const requestedOrder = (process.env.DOCUMENT_AI_PROVIDER_ORDER ?? "gemini,openai")
+  const requestedOrder = (process.env.DOCUMENT_AI_PROVIDER_ORDER ?? "openai,gemini")
     .split(",")
     .map((provider) => provider.trim().toLowerCase())
     .filter((provider): provider is ProviderName => provider === "gemini" || provider === "openai");

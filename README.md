@@ -205,7 +205,8 @@ flowchart TD
 
 ## GPU / NVIDIA Brev Plan
 
-NVIDIA Brev credits are not guaranteed. Brev is a preferred compute path, not a product dependency.
+NVIDIA Brev access has been approved. Brev is the preferred inference path,
+while the hosted Gemini API remains the fallback and is not a product dependency.
 
 ### Preferred Workload
 
@@ -339,23 +340,31 @@ GEMINI_API_KEY=
 GEMINI_MODEL=gemini-2.5-flash
 GEMINI_EMBEDDING_MODEL=gemini-embedding-001
 
-# Optional OpenAI-compatible fallback (base URL, commonly ending in /v1)
+# NVIDIA Brev OpenAI-compatible inference endpoint (base URL, commonly /v1)
 OPENAI_COMPATIBLE_BASE_URL=
 OPENAI_COMPATIBLE_API_KEY=
 OPENAI_COMPATIBLE_MODEL=
+# Optional OpenAI-compatible embedding model (must output 1,536 dimensions)
 OPENAI_COMPATIBLE_EMBEDDING_MODEL=
 
-# Optional; defaults to Gemini first, then OpenAI-compatible
-DOCUMENT_AI_PROVIDER_ORDER=gemini,openai
+# Optional; Brev is tried first when configured, then Gemini
+DOCUMENT_AI_PROVIDER_ORDER=openai,gemini
 ```
 
-The OpenAI-compatible endpoint must expose `/chat/completions` and `/embeddings`,
-and its embedding model must return exactly 1,536 dimensions to match the
-pgvector column. The compatible chat endpoint accepts images but not PDF files;
-PDF selectable text is extracted locally before sending, while scanned-PDF
-vision requires Gemini. The UI discloses that document content is sent to the
-configured AI provider. If every configured provider fails, processing shows a
-retry state instead of inventing a summary.
+The Brev endpoint must expose `/chat/completions`. It is called with the
+OpenAI-compatible model name configured above. If an embedding model is also
+served there, it must expose `/embeddings` and return exactly 1,536 dimensions
+to match pgvector. Otherwise Gemini provides embeddings. Compatible chat
+endpoints support images but not PDF files; selectable PDF text is extracted
+locally before sending, while scanned-PDF vision uses Gemini. The UI discloses
+that document content is sent to the configured AI providers. If a provider
+fails, the next configured provider is tried; if all fail, processing shows a
+retry state rather than inventing a summary.
+
+Google sign-in is started from the landing navigation using Supabase OAuth.
+Enable the Google provider and identity linking in Supabase Auth, and allow the
+app's local and deployed origins as redirect URLs. When a guest session exists,
+FormFriend links Google to that session so its document ownership is retained.
 
 The document API verifies the guest-session JWT, checks document ownership,
 extracts PDF text server-side, requests a grounded JSON overview, stores

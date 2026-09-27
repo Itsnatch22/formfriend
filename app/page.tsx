@@ -31,6 +31,11 @@ import {
 import { uploadDocument } from "@/lib/documents/upload";
 import { askDocumentQuestion, processDocument } from "@/lib/documents/client";
 import type { DocumentAnalysis, DocumentUnderstanding } from "@/lib/documents/types";
+import { Footer } from "@/components/Footer";
+import { HowItWorks } from "@/components/HowItWorks";
+import { Navbar } from "@/components/Navbar";
+import { ProblemStatement } from "@/components/ProblemStatement";
+import { TargetUsers } from "@/components/TargetUsers";
 
 type AppView = "home" | "uploading" | "uploaded" | "sample";
 type ChatMessage = {
@@ -105,70 +110,6 @@ function getDemoResponse(question: string) {
   };
 }
 
-function Logo({
-  onClick,
-  disabled,
-}: {
-  onClick: () => void;
-  disabled: boolean;
-}) {
-  return (
-    <button
-      className="brand brand-button"
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-label="FormFriend home"
-    >
-      <span className="brand-mark" aria-hidden="true">
-        <FileText size={19} strokeWidth={2.1} />
-        <span className="brand-spark">
-          <Sparkles size={10} strokeWidth={2.4} />
-        </span>
-      </span>
-      <span>formfriend</span>
-    </button>
-  );
-}
-
-function Header({
-  onHome,
-  workspace,
-  busy,
-  privateUpload,
-}: {
-  onHome: () => void;
-  workspace: boolean;
-  busy: boolean;
-  privateUpload: boolean;
-}) {
-  return (
-    <header className="topbar">
-      <div className="topbar-inner">
-        <Logo onClick={onHome} disabled={busy} />
-        {workspace ? (
-          <div className="workspace-header-right">
-            <span className="preview-badge">
-              <span className="preview-dot" />
-              {busy ? "Saving securely" : privateUpload ? "Saved privately" : "Sample preview"}
-            </span>
-            <span className="header-divider" />
-            <span className="privacy-note">
-              <LockKeyhole size={13} />
-              Private, no-account upload
-            </span>
-          </div>
-        ) : (
-          <div className="header-note">
-            <ShieldCheck size={14} />
-            <span>No account needed</span>
-          </div>
-        )}
-      </div>
-    </header>
-  );
-}
-
 function UploadZone({
   onFile,
   onSample,
@@ -210,7 +151,7 @@ function UploadZone({
   }
 
   return (
-    <div className="upload-wrap">
+    <div className="upload-wrap" id="upload">
       <input
         ref={inputRef}
         className="visually-hidden"
@@ -281,47 +222,46 @@ function HomeView({
   onSample: () => void;
 }) {
   return (
-    <main className="landing-main">
-      <div className="landing-content">
-        <div className="eyebrow">
-          <span className="eyebrow-line" />
-          A little help with the paperwork
+    <>
+      <main className="landing-main" id="top">
+        <div className="landing-content">
+          <div className="eyebrow">
+            <span className="eyebrow-line" />
+            A little help with the paperwork
+          </div>
+          <h1>
+            Make forms
+            <br />
+            <span>make sense.</span>
+          </h1>
+          <p className="landing-description">
+            Upload a form. Understand what it means.
+            <br className="desktop-break" /> Know what you need before you start.
+          </p>
+          <UploadZone onFile={onFile} onSample={onSample} />
+          <div className="capability-row" aria-label="What FormFriend can help with">
+            <span>
+              <ScanText size={15} />
+              Explain confusing fields
+            </span>
+            <i />
+            <span>
+              <ListChecks size={15} />
+              Find what you’ll need
+            </span>
+            <i />
+            <span>
+              <MessageCircle size={15} />
+              Ask questions
+            </span>
+          </div>
         </div>
-        <h1>
-          Make forms
-          <br />
-          <span>make sense.</span>
-        </h1>
-        <p className="landing-description">
-          Upload a form. Understand what it means.
-          <br className="desktop-break" /> Know what you need before you start.
-        </p>
-        <UploadZone onFile={onFile} onSample={onSample} />
-        <div className="capability-row" aria-label="What FormFriend can help with">
-          <span>
-            <ScanText size={15} />
-            Explain confusing fields
-          </span>
-          <i />
-          <span>
-            <ListChecks size={15} />
-            Find what you’ll need
-          </span>
-          <i />
-          <span>
-            <MessageCircle size={15} />
-            Ask questions
-          </span>
-        </div>
-      </div>
-      <div className="landing-footer">
-        <span>Built to make the fine print feel a little less fine.</span>
-        <span>
-          <LockKeyhole size={12} />
-          Private guest storage · AI-assisted understanding
-        </span>
-      </div>
-    </main>
+      </main>
+      <ProblemStatement />
+      <HowItWorks />
+      <TargetUsers />
+      <Footer />
+    </>
   );
 }
 
@@ -1304,7 +1244,7 @@ export default function Home() {
 
   return (
     <div className="app-shell">
-      <Header
+      <Navbar
         onHome={resetHome}
         workspace={view !== "home"}
         busy={view === "uploading" && !uploadError}
