@@ -240,9 +240,6 @@ export async function extractDocumentPages(
 ): Promise<DocumentPage[]> {
   if (mimeType === "application/pdf") {
     const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-    pdfjs.GlobalWorkerOptions.workerSrc = await import.meta.resolve(
-      "pdfjs-dist/legacy/build/pdf.worker.mjs",
-    );
     const pdf = await pdfjs.getDocument({
       data: new Uint8Array(bytes),
       useSystemFonts: true,
